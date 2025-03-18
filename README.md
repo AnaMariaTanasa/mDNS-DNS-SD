@@ -76,7 +76,6 @@ informații esențiale despre interogare.
     sau eșecul unei interogări DNS, trebuie să fie întotdeauna 0 (ceea
     ce înseamnă \"fără eroare\").
 
-![Tabel Flags](Imagini/tabel_flags.png)
 
 -   Numărul de înregistrări (Questions): Numărul de întrebări din
     interogare (de obicei, 1 pentru o interogare standard).
@@ -93,9 +92,9 @@ informații esențiale despre interogare.
 -   Tipul de înregistrare (A, AAAA, PTR, SRV, TXT)
 -   Clasa
 
-![Query in Wireshark](Imagini/query_wireshark.png)
 
-![Response in Wireshark](Imagini/response_wireshark.png)
+
+
 
 ## Completări mDNS
 * Folosește doar utf8 pentru a reprezenta numele de domenii primite drept răspuns.
@@ -129,20 +128,10 @@ timp:
     "_http._tcp" (adică servere web) pentru domeniul "example.com".
 
 
-
-![SRV](Imagini/SRV.png)
-
-
-
 2.  Înregistrările PTR (pointer record) leagă un nume de domeniu de o
     adresă IP (reverse lookup). Numele acesteia este adresa IP în format
     inversat, urmată de sufixul in-addr.arpa pentru adrese IPv4 sau
     ip6.arpa pentru cele IPv6.
-
-
-
-![PTR](Imagini/PTR.png)
-
 
 
 3.  Înregistrările A și AAAA sunt tipuri de înregistrări DNS folosite
@@ -153,11 +142,6 @@ timp:
 
     Înregistrarea AAAA (Quad A Record) asociază un nume de domeniu cu o
     adresă IPv6 (128 biți).
-
-
-
-![A](Imagini/A.png)
-
 
 
 4.  Înregistrările TXT permit stocarea de informații textuale asociate
@@ -175,9 +159,6 @@ timp:
     -   Dacă o cheie apare de mai multe ori, doar prima apariție va fi
         considerată.
 
-
-
-![Inregistrari](Imagini/records.png)
 
 ## Formatul mesajului
 
@@ -238,7 +219,7 @@ timp:
   Comprimarea mesajului în cadrul protoculului mDNS este realizată cu scopul de a reduce lungimea pachetului  prin 
   înlocuirea numelor de domenii sau a unei liste de etichete cu un pointer ce indică prima apariție a elementului în mesaj.
 
-  ![Comprimare](Imagini/comprimare1.jfif)
+
 
   Primii doi biți de unu indică faptul că urmează un pointer, întrucât o etichetă incepe cu doi biți de zero( combinațiile 
   “10” și “01” sunt rezervate pentru utilizări viitoare). Prin această comprimare, un nume de domeniu poate fi reprezentat 
@@ -247,49 +228,10 @@ timp:
   Prin pointer se pot reprezenta doar numele de domeniu cu un format  nespecific unei clase.
   Exemplu:
 
-   ![Comprimare](Imagini/comprimare2.jfif)
-
   În această diagramă, numele de domeniu F.ISI.ARPA e reprezentat de la octetul 20, iar FOO.F.ISI.ARPA de la octetul 44 
   prin intermediul concatenarii etichetei FOO cu un pointer spre F.ISI.ARPA. Numele de domeniu rădăcină/principal se 
   reprezintă printr-un șir de octeți de 0(nu are etichete). Valorile de 1,3,4 ce preced “F”,”ISI” și “ARPA” reprezintă 
   lungimea șirurilor de caractere.
-
- ## Testare mDNS și DNS-SD folosind Bonjour și Wireshark
- 1. Căutăm toate instanțele de servicii _http._tcp
-
-     ![Servicii](Imagini/http._tcp.jfif)
-
-     * Captura Wireshark pentru executarea comenzii DNS-SD( folosind si Bonjour SDK).Se observă că pentru serviciul căutat 
-       se primesc doar pachete ce conțin înregistrări PTR.
-
-       ![Wireshark](Imagini/capture1.jfif)
-
-     * Un pachet ce conține întrebarea și un răspuns cu o înregistrare PTR
-
-        ![Wireshark](Imagini/capture2.jfif)
-
-2. Cerem mai multe detalii despre o instanță de serviciu _http_tcp
-
-    ![Informatii](Imagini/informatii_http._tcp.jfif)
-
-   * Captura Wireshark pentru executarea comenzii anterioare. Se poate observa că se primesc drept raspuns înregistrări de 
-     tip SRV(cu target, interfață, MAC), iar la momentul încheierii TTL, se mai trimite o dată răspunsul de tip SRV, 
-     împreună cu răspunsuri adiționale de tip A(IPv4), AAA(IPv6).
-
-      ![Wireshark](Imagini/capture3.jfif)
-
-   * Structura unui pachet de răspuns ce conține o înregistrare SRV
-
-     ![pachet_srv](Imagini/pachet_srv.jfif)
-
-
-3. Înregistrăm un serviciu
-
-   ![inregistrare_serviciu](Imagini/inregistrare_serviciu.jfif)
-
-   * Se observă că apar înregistrări de tip SRV și TXT
-  
-     ![srv_txt](Imagini/srv_txt.jfif)
 
 ## Module Python 
 
@@ -301,7 +243,7 @@ timp:
 
 4. Sqlite3 permite interacțiunea cu baze de date SQLite, folosit pentru implementarea cache-ului. Baza de date sql lite va conține tabela services cu următoarele coloane: TXT_DATA, A_DATA, SRV_DATA, INSTANCE_NAME, SERVICE_NAME și TTL.
 Se vor crea două conexiuni cu această bază de date, una pentru scrierea informațiilor necesare din pachetele de răspuns DNS-SD și cealaltă se va ocupa de ștergerea datelor al căror TTL a expirat, se scade din TTL-ul fiecărui serviciu din cache perioada timer-ului de 30s. Astfel, aceste două conexiuni pot citi date simultan din baza de date, dar doar unul o poate modifica la un moment dat.
-![cache](Imagini/cache.png)
+
 
 5. Threading-ul (multi-threading) este o tehnică de programare care permite executarea mai multor fire de execuție (threads) într-un proces, facilitând rularea de operațiuni simultane.
    * Thread pentru scriptul de monitorizare: Un thread ascultă continuu pachetele DNS-SD, decodifică întrebările și trimite pachete DNS-SD de răspuns.
@@ -310,7 +252,6 @@ Se vor crea două conexiuni cu această bază de date, una pentru scrierea infor
         2. Un thread pentru actualizarea TTL-ului serviciilor din cache, la fiecare perioadă a timer-ului scade 30s din TTL.
    * Thread pentru interfața cu utilizatorul: Acesta este responsabil pentru gestionarea interacțiunii utilizatorului prin interfața grafică folosit la nivelor ambelor scripturi.
  
-
 ## Structura aplicației
 Aplicația constă în două scripturi:
 
@@ -326,9 +267,6 @@ Mai întâi va trimite un pachet care va conține doar un PTR ca răspuns la în
 ## Scriptul 2
 Acesta va asculta pentru a recepționa pachetele DNS-SD și va întreba prin multicast care sunt serviciile disponibile. Va afișa pe interfață o listă cu acestea, precizând numele de domeniu din PTR_DATA. Utilizatorul poate selecta un serviciu pentru a vizualiza detalii suplimentare. La selecatarea unui serviciu, scriptul consultă cache-ul pentru a verifica dacă există instanțe cu date valabile care oferă acest tip de serviciu. Dacă acestea sunt expirate/indisponibile, trimite o cerere DNS-SD pentru a obține valorile actualizate (adresa IP a instanței care monitorizează resursa și valoarile actuale ale resurselor). Odată ce acest serviciu a fost descoperit și a oferit date, acestea vor fi salvate în cache și afișate pe interfață. Astfel se vor reduce numărul de cereri. 
 
-![diag_secv](Imagini/diagrama.png)
-
-
 ## Lucruri dificile de implementat
 
 1. Crearea unui pachet de răspuns DNS-SD complet, care să includă toate înregistrările PTR, A, SRV și TXT, este un proces destul de complex. Cu ajutorul documentației oficiale, care detaliază formatele acestor tipuri de răspunsuri adiționale, și prin testarea repetată utilizând Wireshark, am reușit să codificăm un pachet DNS-SD care conține răspunsurile adiționale și să-l trimitem prin multicast.
@@ -338,60 +276,6 @@ Acesta va asculta pentru a recepționa pachetele DNS-SD și va întreba prin mul
 3. Pentru accesul concurent la cache-ul necesar pentru stocarea serviciilor am folosit o bază de date care permite crearea mai multor conexiuni care să citească date simultan din baza de date. Totuși, atunci când vrem să modificăm datele, doar o singură conexiune poate deține un "lock" la un moment dat. Aceasta va bloca modificările simulatane ale altor conexiuni până când tranzacția este completă (folosind COMMIT).
 
 4. Decodificarea pachetelor DNS-SD este dificil de realizat, dar ținând cont de formatul specific acestora am reușit să dezvoltăm un cod care extrage eficient câmpurile de interes din pachete. 
-
-
-## Rularea programului în PyCharm: explicații și capturi de ecran
-
-1. Rularea scriptului de monitorizare, configurând la nivelul interfeței hostname-ul, TTL și resursele de monitoriza, acțiune finalizată cu apăsarea butonului Submit
-   
-![configurare_monitorizare](Imagini/configurare_monitorizare.png)
-
-3. Rularea scriptului de descoperire care trimite întrebare pentru a afla serviciile disponibile în rețea care vor fi salvate în cache
-   
-![servicii_disponibile](Imagini/servicii_disponibile.jpg)
-
-5. Statusul de pe interfața scriptului de monitorizare care indică așteptarea întrebării de mai sus se schimbă în mod dinamic.
-   
-![status_general](Imagini/status_general.png)
-
-7. Selectarea unui serviciu din interfața scriptului de descoperire determină trimiterea unei întrebări pentru aflarea datelor din înregistrările SRV, A și TXT dacă nu se găsește deja o instanță în cache care să ofere serviciul selectat. În caz că există deja una, se va actualiza TTL pe baza hostname-ului din rdata înregistrării SRV.
-   
-![http](Imagini/http.jpg)
-
-![serviciu_creat](Imagini/serviciu_creat.jpg)
-
-9. Dacă se selectează serviciul creat pe baza resurselor, se va schimba și al doilea status de pe interfața scriptului de monitorizare.
-    
-![status_records](Imagini/status_records.png)
-
-11. Când TTL-ul unui serviciu expiră, acesta este scos din cache.
-
-![serviciu_expirat](Imagini/serviciu_expirat.jpg)
-
-13. La următoarele rulări ale scriptului de descoperire, dacă serviciile obținute ca răspuns există deja în cache, se va actualiza doar TTL-ul lor.
-    
-![ttl_actualizat](Imagini/ttl_actualizat.jpg)
-
-## Capturarea pachetelor codificate cu ajutorul aplicației Wireshark
-
-* Pachet care conține întrebarea pentru obținerea serviciilor disponibile
-  
-![intrebare_generala](Imagini/intrebare_generala.png)
-
-* Pachet care prezintă la secțiunea răspunsuri serviciul creat
-  
-![raspuns_general](Imagini/raspuns_general.png)
-
-* Pachet care conține întrebarea pentru aflarea răspunsurilor adiționale ale serviciului creat
-  
-![intrebare_records](Imagini/intrebare_records.png)
-
-* Pachet care prezintă înregistrările PTR, SRV, TXT și A
-  
-![ptr_srv](Imagini/ptr_srv.png)
-
-![txt_a](Imagini/txt_a.png)
-
 
 ## Bibliografie:
 
